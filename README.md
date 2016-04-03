@@ -16,19 +16,19 @@ The repository is organized as follows,
 
 * `softwares` - this folder will hold all the softwares that will be used by the playbooks in provisioning various softwares without going to internet.
 An example to provision a EAP on Domain mode with JON and EWS, the software folder will hold the following softwares,
-  <ul>
-  <li>apache-maven-3.3.9-bin.tar.gz</li>
-  <li>jboss-eap-6.4.0-installer.jar</li>
-  <li>jboss-eap-6.4.5-patch.zip</li>
-  <li>jboss-eap-native-6.4.0-RHEL7-x86_64.zip</li>
-  <li>jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip</li>
-  <li>jon-plugin-pack-eap-3.3.0.GA.zip</li>
-  <li>jon-plugin-pack-ews-3.3.0.GA.zip</li>
-  <li>jon-server-3.3.0.GA.zip</li>
-  <li>jws-application-servers-3.0.2-RHEL7-x86_64.zip</li>
-  <li>jws-httpd-3.0.2-RHEL7-x86_64.zip</li>
-  <li>rhq-enterprise-agent-4.12.0.JON330GA.jar</li>
-  </ul>
+	<ul>
+	<li>apache-maven-3.3.9-bin.tar.gz</li>
+	<li>jboss-eap-6.4.0-installer.jar</li>
+	<li>jboss-eap-6.4.5-patch.zip</li>
+	<li>jboss-eap-native-6.4.0-RHEL7-x86_64.zip</li>
+	<li>jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip</li>
+	<li>jon-plugin-pack-eap-3.3.0.GA.zip</li>
+	<li>jon-plugin-pack-ews-3.3.0.GA.zip</li>
+	<li>jon-server-3.3.0.GA.zip</li>
+	<li>jws-application-servers-3.0.2-RHEL7-x86_64.zip</li>
+	<li>jws-httpd-3.0.2-RHEL7-x86_64.zip</li>
+	<li>rhq-enterprise-agent-4.12.0.JON330GA.jar</li>
+	</ul>
 
 * `scripts` - this folder will hold all the scripts that will be used for provisioning `vagrant` boxes for test and demo purposes, typically testing all the playbooks works fine before actual deployment
 
@@ -65,7 +65,11 @@ Provisioning command
 
 > $ ansible-playbook -i provisioning/inventory [all|db|eap|ews| eap-master|eap-slaves] play_name
 
-where `play_name` is one from the list of [Plays](#Plays) defined above
+where `play_name` is one from the list of [Plays](#plays) defined above
+
+e.g. to run firewall playbooks on all nodes
+
+> $  ansible-playbook -i provisioning/inventory all firewall.yml
 
 ## WIP
 The following are the currently identified improvements,
