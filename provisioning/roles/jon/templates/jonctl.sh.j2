@@ -1,0 +1,4 @@
+#!/bin/bash
+export JAVA_HOME="/usr"
+export RHQ_JAVA_HOME="$JAVA_HOME"
+sudo -E -u {{jon_service_user}} {{jon_home}}/bin/rhqctl "$@"

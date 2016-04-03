@@ -1,0 +1,60 @@
+---
+
+- name: install postgresql
+  yum: 
+    name: "{{item}}"
+    state: present
+  with_items:
+      - postgresql-server
+      - postgresql
+      - postgresql-contrib
+      - python-psycopg2
+  notify:
+    - init postgresql 
+  tags: [pgsql]
+
+- name: set postgres password
+  user:
+    name: postgres
+    password: "{{postgres_posix_password}}"
+
+- name: enable postgresql
+  service:
+    name: "postgresql"
+    enabled: yes
+    state: running
+  tags: [pgsql]
+
+#- name: set postgres user password
+#  postgresql_user: 
+#    name: postgres
+#    db: template1
+#    password: "{{postgres_user_password|hash('md5')}}"
+#    login_password: "{{postgres_user_password|hash('md5')}}"
+#  become_user: postgres
+#  tags: [pgsql]
+
+- name: allow peer authentication
+  lineinfile:
+    backrefs: yes
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    regexp: '(^local\s+all\s+all\s+)peer$'
+    line: '\1 md5'
+  notify:
+    - reload postgresql config
+  register: reload_pg_conf
+  tags: [pgsql]
+
+- name: trust local authentication
+  lineinfile:
+    backrefs: yes
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    regexp: '(^host\s+all\s+all\s+127.0.0.1/32\s+)trust$'
+    line: '\1 md5'
+  notify:
+    - reload postgresql config
+  register: reload_pg_conf
+
+  tags: [pgsql]
+- meta: flush_handlers
+  when: reload_pg_conf

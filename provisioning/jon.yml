@@ -1,0 +1,11 @@
+ - hosts: jon-servers
+   become: yes
+   vars_files:
+     - vars/common_vars.yml
+     - vars/pgsql_vars.yml
+     - vars/jon_vars.yml
+   roles:
+     - common
+     - pgsql
+     - java
+     - jon

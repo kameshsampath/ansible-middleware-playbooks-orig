@@ -1,0 +1,75 @@
+---
+
+- name: install required packages
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items: "{{required_packages}}"
+
+- name: "Create EWS User"
+  user: 
+    name: "{{ews_service_user}}"
+    uid: 48
+    shell: /sbin/nologin
+    state: present
+  tags: [ews]
+
+- name: install ews
+  unarchive:
+    copy: no
+    src: "{{ews_installer_archive}}"
+    dest: "{{ews_install_path}}"
+    owner: "{{ews_service_user}}"
+    group: "{{ews_service_user}}"
+    creates: "{{ews_home}}/httpd/conf/httpd.conf"
+  tags: [ews]
+
+- file: path="{{ews_home}}" state=touch  owner="{{ews_service_user}}" group="{{ews_service_user}}"
+
+- name: install ews service
+  template:
+    src: ews.service.j2
+    dest: /usr/lib/systemd/system/jboss-ews.service
+  notify:
+    - reload jboss-ews
+  tags: [ews]
+
+- name: enable ews service
+  service:
+    name: jboss-ews.service
+    enabled: yes
+  tags: [ews]
+
+- name: post install
+  shell: "./.postinstall"
+  args:
+    chdir: "{{ews_home}}/httpd"
+  run_once: yes
+  tags: [ews]
+
+- name: disable ssl
+  command: "mv {{ews_home}}/httpd/conf.d/ssl.conf {{ews_home}}/httpd/conf.d/ssl.conf.disabled"
+  args: 
+    chdir: "{{ews_home}}"
+    creates: "{{ews_home}}/httpd/conf.d/ssl.conf.disabled"
+  when: not ssl_enabled
+
+- name: copy httpd configuration
+  template:
+    backup: yes
+    src: httpd.conf.j2
+    dest: "{{ews_home}}/httpd/conf/httpd.conf"
+    owner: "{{ews_service_user}}"
+    group: "{{ews_service_user}}"
+  notify:
+    - restart jboss-ews
+
+- name: copy mod_cluster
+  template:
+    backup: yes
+    src: mod_cluster.conf.j2
+    owner: "{{ews_service_user}}"
+    group: "{{ews_service_user}}"
+    dest: "{{ews_home}}/httpd/conf.d/mod_cluster.conf"
+  notify:
+    - restart jboss-ews

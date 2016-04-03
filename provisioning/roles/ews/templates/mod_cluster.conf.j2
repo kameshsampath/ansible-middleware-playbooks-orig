@@ -1,0 +1,45 @@
+#
+# {{ansible_managed}}
+#
+
+<IfModule mpm_prefork_module>
+    ServerLimit         200
+    StartServers        5
+    MinSpareServers     5
+    MaxSpareServers     20
+    MaxClients          200
+    MaxRequestsPerChild 0
+</IfModule>
+
+LoadModule cluster_slotmem_module modules/mod_cluster_slotmem.so
+LoadModule manager_module modules/mod_manager.so
+LoadModule proxy_cluster_module modules/mod_proxy_cluster.so
+LoadModule advertise_module modules/mod_advertise.so
+
+MemManagerFile cache/mod_cluster
+
+Listen {{cluster_listen_ip}}:{{cluster_listen_port}}
+
+
+<VirtualHost {{cluster_listen_ip}}:{{cluster_listen_port}}>
+    
+    LogLevel debug
+
+    <Directory "/">
+        Require ip {{cluster_nodes_ip_wildcard}}
+    </Directory>
+
+    KeepAliveTimeout 60
+    MaxKeepAliveRequests 0
+    ManagerBalancerName vagranteapdemo
+    AllowDisplay On
+    ServerAdvertise On
+    EnableMCPMReceive On
+    AdvertiseFrequency 5
+
+    <Location /mod_cluster-manager>
+       SetHandler mod_cluster-manager
+       Require ip {{cluster_nodes_ip_wildcard}}
+    </Location>
+
+</VirtualHost>

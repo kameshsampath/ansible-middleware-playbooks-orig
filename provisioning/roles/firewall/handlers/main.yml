@@ -1,0 +1,7 @@
+---
+
+- name: reload firewall-cmd
+  shell: "firewall-cmd --reload"
+
+- name: flush iptables
+  shell: "iptables -F"

@@ -1,0 +1,9 @@
+---
+rhqadmin_password: redh@t123
+jon_service_user: "jon"
+jon_installer_archive: "../softwares/jon-server-3.3.0.GA.zip"
+jon_eap_plugin_archive: "../jon-plugin-pack-eap-3.3.0.GA"
+jon_ews_plugin_archive: "../jon-plugin-pack-ews-3.3.0.GA"
+jon_install_path: /var/lib/jon-server/
+rhq_data_storage: "{{jon_install_path}}rhq-data"
+jon_home: "{{jon_install_path}}jon-server-3.3.0.GA"

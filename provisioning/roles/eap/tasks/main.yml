@@ -1,0 +1,99 @@
+---
+
+- set_fact:
+    eap_install_script: "/tmp/{{product_name}}-{{product_version}}-install.xml"
+  tags: [eap]
+
+- name: "Create JBoss User"
+  user: 
+    name: "eap_service_user"
+    shell: /sbin/nologin
+    state: present
+  tags: [eap]
+
+- name: "Create Install Script"
+  template:
+    src: "installscript.xml.j2"
+    dest: "{{eap_install_script}}"
+  register: result
+  tags: [eap]
+
+- name: "Setup EAP"
+  command: "java -jar {{software_repo}}/jboss-eap-6.4.0-installer.jar {{eap_install_script}}"
+  args:
+    creates: "{{eap_install_path}}"
+  when: result
+  register: installed
+  tags: [eap]
+
+- stat: 
+    path: "{{eap_install_path}}"
+  register: jboss_home
+  when: installed
+  tags: [eap]
+
+- name: install native dependent packages
+  yum:
+    name: "{{item}}"
+    state: present
+  when: install_natives
+  with_items: "{{native_dependent_packages}}"
+
+- unarchive:
+    src: "{{eap_native_components_archive}}"
+    dest: "/tmp"
+    owner: "{{eap_service_user}}"
+    group: "{{eap_service_user}}"
+  when: installed and install_natives
+  register: do_native_comp_sync
+  tags: [eap]
+
+- synchronize:
+    src: /tmp/jboss-eap-6.4/modules/system/ 
+    dest: "{{eap_install_path}}/system/" 
+  delegate_to: "{{ ansible_ssh_host }}"
+  when: do_native_comp_sync
+  tags: [eap]
+
+- name: "Change Ownership of EAP home"
+  file:
+    path: "{{eap_install_path}}"
+    owner: "{{eap_service_user}}"
+    group: "{{eap_service_user}}"    
+    recurse: yes
+    state: directory
+  when: jboss_home
+  tags: [eap]
+
+- name: create control script
+  template:
+    src: eapctl.sh.j2
+    dest: /usr/local/bin/eapctl.sh
+    mode: 0755
+  when: jboss_home
+  tags: [eap]
+
+## Setup Domain Controller settings
+
+- name: create slave identity
+  shell: "{{eap_install_path}}/bin/add-user.sh -u {{slaves[item].slave_host_name}} -p {{slaves[item].password}}"
+  with_items: "{{slaves|list}}"
+  when: jboss_config == 'domain' and ( domain_controller | default(false) )
+  tags: [eap]
+
+## Setup host-slave.xml settings
+- name: set name for slave
+  lineinfile:
+    dest: "{{eap_install_path}}/domain/configuration/host-slave.xml"
+    backrefs: yes
+    regexp: '(^<host)\s*(?:name(.*))?(\s*xmlns="urn:jboss:domain:1.7">$)'
+    line: '\1 name="{{slaves[ansible_hostname].slave_host_name}}" \3'
+  when:  jboss_config == 'domain' and  slave  == 'true'
+
+- name: set slave identity
+  lineinfile:
+    dest: "{{eap_install_path}}/domain/configuration/host-slave.xml"
+    backrefs: yes
+    regexp: '(^(.*)<secret value=").*("/>$)'
+    line: '\1{{ slaves[ansible_hostname].password | b64encode }}\3'
+  when:  jboss_config == 'domain' and slave  == 'true'

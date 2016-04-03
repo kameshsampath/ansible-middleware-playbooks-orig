@@ -1,0 +1,39 @@
+---
+
+- name: reload jboss-ews
+  shell: systemctl daemon-reload
+  notify:
+    - restart jboss-ews
+
+- name: restart jboss-ews
+  service:
+    name: jboss-ews
+    state: restarted
+  notify:
+    - listen for ews
+
+- name: start jboss-ews
+  service:
+    name: jboss-ews
+    state: started
+  notify:
+    - listen for ews
+
+- name: stop jboss-ews
+  service:
+    name: jboss-ews
+    state: stopped
+  notify:
+    - unlisten for ews
+
+- name: listen for ews
+  wait_for: port="{{ ssl_enabled | ternary(jboss_ews_ports['https'].port,jboss_ews_ports['http'].port) }}" host="{{ httpd_ip | default(inventory_hostname) }}" timeout=15
+  notify:
+    - check ews is available
+
+- name: unlisten for ews
+  wait_for: port="{{ ssl_enabled | ternary(jboss_ews_ports['https'].port,jboss_ews_ports['http'].port) }}" timeout=15 state=stopped
+
+- name: check ews is available
+  uri:
+    url: "{{ ssl_enabled | ternary('https','http')}}://{{httpd_ip}}:{{jboss_ews_ports['http']}}"

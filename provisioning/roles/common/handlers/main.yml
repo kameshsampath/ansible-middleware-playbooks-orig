@@ -1,0 +1,53 @@
+---
+
+- name: reload eap service unit
+  shell: systemctl daemon-reload
+  notify:
+    - restart eap
+
+- name: restart eap
+  service: 
+    name: jboss-eap.service
+    state: restarted
+  notify:
+    - listen for eap
+
+- name: stop eap
+  service: 
+    name: jboss-eap.service
+    state: stopped
+  notify:
+    - unlisten for eap
+
+- name: restart postgresql
+  service: 
+    name: postgresql.service
+    state: restarted
+
+- name: stop postgresql
+  service: 
+    name: postgresql.service
+    state: stopped
+
+- name: init postgresql
+  shell: postgresql-setup initdb
+
+- name: reload postgresql config
+  shell: pg_ctl reload
+  environment:
+    PGDATA: /var/lib/pgsql/data
+  become_user: postgres
+
+
+- name: listen for eap
+  wait_for: port="{{ eap_http_port }}" host="{{ ansible_ssh_host | default(inventory_hostname) }}" timeout=30
+  ignore_errors: yes
+  notify:
+    - check eap is available
+
+- name: unlisten for eap
+  wait_for: port="{{ eap_http_port }}" host="{{ ansible_ssh_host | default(inventory_hostname) }}" timeout=30 state=stopped
+
+- name: check eap is available
+  uri:
+    url: "http://{{ip}}:{{eap_http_port}}"

@@ -1,0 +1,33 @@
+--- 
+cluster_password: jbossRedHat@123
+eap_admin_user: admin
+eap_admin_user_password: redh@t123
+install_natives: true
+eap_http_port: "{{8080 + port_offset * 100 }}"
+eap_install_path: "/var/lib/jboss-{{product_name}}-{{product_version}}"
+eap_installer_file: jboss-eap-6.4.0-installer.jar
+eap_native_components_archive: "../softwares/jboss-eap-native-6.4.0-RHEL7-x86_64.zip"
+eap_service_user: jboss
+bind_http_address: "{{ansible_ssh_host}}"
+bind_mgmt_address: "{{ansible_ssh_host}}"
+bind_unsecure_address: "{{ansible_ssh_host}}"
+jboss_config: domain
+port_offset: 0
+product_name: eap
+product_version: "6.4.0"
+slaves: 
+  eap-node-2: 
+    slave_host_name: eapnode2
+    password: redh@t123
+  eap-node-3:
+    slave_host_name: eapnode3
+    password: redh@t123
+native_dependent_packages: 
+  - apr
+  - apr-devel
+  - apr-util
+  - apr-util-devel
+  - apr-util-ldap
+  - elinks
+  - krb5-workstation
+  - mailcap

@@ -1,0 +1,3 @@
+---
+postgres_posix_password: $6$rounds=656000$aVozpJmLQOaRoaH5$.KMdxvmBH6vo94MjQXd5JHPOVlg1xNK6nypS68U1A5HgCsavhIpJ8BcozShZ4ejt5GD9SvIryI15dhiPXDXrZ1
+postgres_user_password: postgres

@@ -1,0 +1,10 @@
+---
+ - hosts: eap
+   become: yes
+   vars_files:
+     - vars/common_vars.yml
+     - vars/eap_vars.yml
+   roles:
+     - common
+     - java
+     - eap

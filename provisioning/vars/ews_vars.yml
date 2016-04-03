@@ -1,0 +1,16 @@
+--- 
+ews_service_user: apache
+ews_installer_archive: "/vagrant/softwares/jws-httpd-3.0.2-RHEL7-x86_64.zip"
+ews_install_path: /var/lib/
+ews_home: "{{ews_install_path}}jws-3.0"
+ssl_enabled: false
+jon_enabled: false
+httpd_ip: "{{ansible_ssh_host}}"
+cluster_listen_ip: "{{ansible_ssh_host}}"
+cluster_listen_port: 8081
+cluster_nodes_ip_wildcard: 192.168.
+jboss_ews_ports:
+  http:
+    port: 80
+  https:
+    port: 443

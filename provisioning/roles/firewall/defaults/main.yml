@@ -1,0 +1,74 @@
+--- 
+firewall_enabled_ports: 
+  https:
+    zone: internal
+    port: 443
+    protocol: tcp
+  http:
+    zone: internal
+    port: 80
+    protocol: tcp
+  jboss_http:
+    zone: internal
+    port: 8080
+    protocol: tcp
+  jboss_ajp:
+    zone: internal
+    port: 8009
+    protocol: tcp
+  jboss_mgmt_http:
+    zone: internal
+    port: 9990
+    protocol: tcp
+  jboss_mgmt_native:
+    zone: internal
+    port: 9999
+    protocol: tcp
+  modcluster_http:
+    zone: internal
+    port: 8081
+    protocol: tcp
+  modcluster_udp: 
+    zone: internal
+    port: 23364
+    protocol: udp
+  rhq_http:
+    zone: internal
+    port: 7080
+    protocol: tcp
+  rhq_https:
+    zone: internal
+    port: 7443
+    protocol: tcp
+  rhq_storage:
+    zone: internal
+    port: 9142
+    protocol: tcp
+  rhq_storage_jmx:
+    zone: internal
+    port: 7100
+    protocol: tcp
+  rhq_node_gossip:
+    zone: internal
+    port: 7299
+    protocol: tcp
+  rhq_agent_comm:
+    zone: internal
+    port: 16163
+    protocol: tcp
+  jgroups_mping:
+    zone: internal
+    port: 45700
+    protocol: udp
+  jgroups_dignostics:
+    zone: internal
+    port: 7500
+    protocol: udp
+  messaging_throughput:
+    zone: internal
+    port: 5455
+    protocol: tcp
+internal_zone_interfaces:
+  z_internal:
+    name: internal
+    interface: enp0s8

@@ -1,0 +1,10 @@
+--- 
+required_packages: 
+  - apr
+  - apr-devel
+  - apr-util
+  - apr-util-devel
+  - apr-util-ldap
+  - elinks
+  - krb5-workstation
+  - mailcap

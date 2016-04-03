@@ -1,0 +1,10 @@
+---
+ - hosts: ews
+   become: yes
+   vars_files:
+     - vars/common_vars.yml
+     - vars/ews_vars.yml
+   roles:
+     - common
+     - java
+     - ews

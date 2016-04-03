@@ -1,0 +1,17 @@
+;
+; {{ansible_managed}}
+;
+[Unit]
+Description=Red Hat Web Server
+After=syslog.target network.target
+
+[Service]
+Type=forking
+Restart=on-failure
+RestartSec=10
+ExecStart={{ews_home}}/httpd/sbin/apachectl start
+ExecStop={{ews_home}}/httpd/sbin/apachectl stop
+PrivateTemp=true
+
+[Install]
+WantedBy=multi-user.target

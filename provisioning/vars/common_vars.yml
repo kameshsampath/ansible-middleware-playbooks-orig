@@ -1,0 +1,6 @@
+---
+software_repo: "/vagrant/softwares/"
+openjdk_version: "1.7.0"
+maven_version: "3.3.9"
+maven_download_url: "/vagrant/softwares/apache-maven-{{maven_version}}-bin.tar.gz"
+disable_firewall: false

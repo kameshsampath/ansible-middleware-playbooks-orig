@@ -1,0 +1,42 @@
+--- 
+ # Make SELinux permissible ( temporary, need to enforce again)
+- selinux: policy=targeted state=permissive
+
+- name: disable and stop firewall
+  service: 
+    name: firewalld
+    enabled: no
+    state: stopped
+  when: disable_firewall
+
+- name: is firewalld running
+  service: 
+    name: firewalld
+    state: running
+  when: not disable_firewall
+  tags: [firewall]
+
+- name: map zone and interfaces
+  shell: "firewall-cmd --permanent --zone={{item.value.name}} --add-interface={{item.value.interface}}"
+  with_dict: "{{internal_zone_interfaces}}"
+  when: not disable_firewall
+  notify:
+    - reload firewall-cmd
+
+- name: add firewall rules
+  firewalld:
+    zone: "{{item.value.zone}}"
+    port: "{{item.value.port}}/{{item.value.protocol}}"
+    permanent: yes 
+    state: enabled
+  with_dict: "{{firewall_enabled_ports}}"
+  when: not disable_firewall
+  tags: [firewall]
+
+ # Add host name entries for convinence
+- name: "Add host name entires"
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    backup: yes
+  tags: [hosts]

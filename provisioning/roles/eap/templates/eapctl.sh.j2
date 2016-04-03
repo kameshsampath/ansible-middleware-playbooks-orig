@@ -1,0 +1,17 @@
+#!/bin/bash
+# {{ansible_managed}}
+export JAVA_HOME="/usr"
+exec sudo -E -u {{eap_service_user}} {{eap_install_path}}/bin/{{jboss_config}}.sh \
+-b {{bind_http_address}} \
+-bmanagement={{bind_mgmt_address}} \
+-bunsecure={{bind_unsecure_address}} \
+-Djboss.socker.binding.port-offset={{ eap_http_port }} \
+{% if jboss_config == 'domain' and (domain_controller == 'true' |default(false)) %}
+--host-config=host-master.xml \
+-Djboss.messaging.cluster.password={{cluster_password}} \
+{%elif jboss_config == 'domain' and (slave == 'true' |default(false)) %}
+--host-config=host-slave.xml \
+--master-address={{domain_controller_address}} \
+-Djboss.messaging.cluster.password={{cluster_password}} \
+{% endif %} \
+"$@"
